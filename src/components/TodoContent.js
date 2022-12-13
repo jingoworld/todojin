@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { MdDone, MdDelete, MdEdit } from 'react-icons/md';
+import { useTodoDispatch } from '../TodoContext';
 
 const Edit = styled.div`
   display: flex;
@@ -86,20 +87,55 @@ const TodoText = styled.div`
 
 
 
-function TodoContent({id, done, text}) {
+// function TodoContent({id, done, text}) {
+//     return (
+//         <TodoContentBlock done={done}>
+//             <Checkbox done={done}>{done && <MdDone />}</Checkbox>
+//             <TodoText done={done}>{text}</TodoText>
+//             <Edit>
+//                 <MdEdit />
+//             </Edit>
+//             <Delete>
+//                 <MdDelete />
+//             </Delete>
+//         </TodoContentBlock>
+//     );
+// }
+//
+// export default TodoContent;
+
+function TodoContent({ id, done, text }) {
+    const dispatch = useTodoDispatch();
+
+    const onToggle = () => {
+        dispatch({
+            type: 'TOGGLE',
+            id
+        });
+    };
+
+    const onRemove = () => {
+        dispatch({
+            type: 'REMOVE',
+            id
+        });
+    };
+
     return (
         <TodoContentBlock done={done}>
-            <Checkbox done={done}>{done && <MdDone />}</Checkbox>
+            <Checkbox done={done} onClick={onToggle}>
+                {done && <MdDone />}
+            </Checkbox>
             <TodoText done={done}>{text}</TodoText>
             <Edit>
                 <MdEdit />
             </Edit>
-            <Delete>
+            <Delete onClick={onRemove}>
                 <MdDelete />
             </Delete>
         </TodoContentBlock>
     );
 }
 
-export default TodoContent;
+export default React.memo(TodoContent);
 

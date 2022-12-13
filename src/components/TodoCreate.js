@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useTodoDispatch, useTodoNextId } from '../TodoContext';
 
 const CreateWrapper = styled.div`
   width: 100%;
@@ -41,6 +42,9 @@ const TodoCreateButton = styled.button`
   color: white;
   cursor: pointer;
   background: ${(props) => props.color || "#0C79FE"};
+  &:hover {
+    background-color: gold;;
+  }
 `;
 
 const CreateInput = styled.input`
@@ -51,18 +55,62 @@ const CreateInput = styled.input`
     font-size: 17px;
 `;
 
+// function TodoCreate() {
+//     return (
+//         <>
+//             <CreateWrapper>
+//                 <CreateForm>
+//                 <TodoContentBlock>
+//                     <TodoCreateButton>+</TodoCreateButton><CreateInput placeholder="작업 추가" />
+//                 </TodoContentBlock>
+//                 </CreateForm>
+//             </CreateWrapper>
+//         </>
+//     );
+// }
+//
+// export default TodoCreate;
+
 function TodoCreate() {
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState('');
+    const dispatch = useTodoDispatch();
+    const nextId = useTodoNextId();
+
+    const onToggle = () => setOpen(!open);
+    const onChange = e => setValue(e.target.value);
+    const onSubmit = e => {
+        e.preventDefault();
+        dispatch({
+            type: 'CREATE',
+            todo: {
+                id: nextId.current,
+                text: value,
+                done: false
+            }
+        });
+        nextId.current += 1;
+        setOpen(false);
+        setValue('');
+    };
+
     return (
         <>
-            <CreateWrapper>
-                <CreateForm>
-                <TodoContentBlock>
-                    <TodoCreateButton>+</TodoCreateButton><CreateInput placeholder="작업 추가" />
-                </TodoContentBlock>
-                </CreateForm>
-            </CreateWrapper>
+                <CreateWrapper>
+                    <CreateForm onSubmit={onSubmit}>
+                        <TodoContentBlock>
+                            <TodoCreateButton onClick={onToggle} open={open}>+</TodoCreateButton>
+                            <CreateInput
+                                autoFocus
+                                onChange={onChange}
+                                value={value}
+                                placeholder="작업 추가"
+                            />
+                        </TodoContentBlock>
+                    </CreateForm>
+                </CreateWrapper>
         </>
     );
 }
 
-export default TodoCreate;
+export default React.memo(TodoCreate);
